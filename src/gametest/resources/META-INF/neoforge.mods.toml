@@ -1,0 +1,13 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="AGPL-3.0-or-later"
+[[mods]]
+modId="mobilecamp_gametest"
+version="1.0.0"
+displayName="C.A.M.P. verification"
+[[dependencies.mobilecamp_gametest]]
+modId="mobilecamp"
+type="required"
+versionRange="[0.1.0,)"
+ordering="AFTER"
+side="BOTH"

@@ -1,0 +1,23 @@
+modLoader="javafml"
+loaderVersion="[1,)"
+license="AGPL-3.0-or-later"
+[[mods]]
+modId="mobilecamp"
+version="${version}"
+displayName="C.A.M.P."
+authors="Rusty Shackleford and nfx"
+description='''A rugged expedition shelter that mechanically unfolds from a portable crate. Carry your workshop, sleeping quarters and storage, and enhance them with interchangeable modules.'''
+[[mixins]]
+config="mobilecamp.mixins.json"
+[[dependencies.mobilecamp]]
+modId="neoforge"
+type="required"
+versionRange="[21.1.248,)"
+ordering="NONE"
+side="BOTH"
+[[dependencies.mobilecamp]]
+modId="minecraft"
+type="required"
+versionRange="[1.21.1]"
+ordering="NONE"
+side="BOTH"
