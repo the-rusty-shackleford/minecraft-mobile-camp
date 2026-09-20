@@ -28,7 +28,10 @@ public final class CampPlan {
         for (var p : Shelter.frame()) {
             BlockState state =
                     switch (p.kind()) {
-                        case DECK -> MobileCamp.DECK.get().defaultBlockState();
+                        case DECK -> p.pos().equals(new Shelter.Pos(1, 0, 0))
+                                ? MobileCamp.CONTROL.get().defaultBlockState()
+                                : mount(p.pos()) ? MobileCamp.MOUNT.get().defaultBlockState()
+                                : MobileCamp.DECK.get().defaultBlockState();
                         case POST -> MobileCamp.FRAME.get().defaultBlockState();
                         case WALL -> MobileCamp.PANEL.get().defaultBlockState();
                         case WINDOW ->
@@ -110,6 +113,12 @@ public final class CampPlan {
             if (!seen.add(cell.offset()))
                 throw new IllegalArgumentException("Overlapping camp part " + cell.offset());
         cells = List.copyOf(list);
+    }
+
+    private static boolean mount(Shelter.Pos pos) {
+        if(pos.y()!=0)return false;
+        for(var bay:Shelter.bays())if(pos.x()==bay.x()&&pos.z()==bay.z())return true;
+        return false;
     }
 
     public static BlockPos pos(Shelter.Pos p) {

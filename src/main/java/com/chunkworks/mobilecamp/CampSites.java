@@ -88,4 +88,11 @@ public final class CampSites extends SavedData {
             EDIT_DEPTH.set(EDIT_DEPTH.get() - 1);
         }
     }
+    /** requires: server thread; effects: returns a scoped internal edit's result, releasing scope on throw. */
+    public static <T> T edit(java.util.function.Supplier<T> operation) {
+        EDIT_DEPTH.set(EDIT_DEPTH.get()+1);
+        try { return operation.get(); }
+        finally { EDIT_DEPTH.set(EDIT_DEPTH.get()-1); }
+    }
+
 }

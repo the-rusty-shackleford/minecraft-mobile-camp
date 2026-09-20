@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NPN",
+    "PPP",
+    "NPN"
+  ],
+  "key": {
+    "P": {
+      "item": "minecraft:spruce_planks"
+    },
+    "N": {
+      "item": "minecraft:iron_nugget"
+    }
+  },
+  "result": {
+    "id": "mobilecamp:panel",
+    "count": 4
+  }
+}

@@ -38,7 +38,7 @@ public final class CampBlockEntity extends BlockEntity {
 
     private Phase phase = Phase.DEPLOYING;
     private int progress;
-    private boolean initialized, paused;
+    private boolean initialized, paused, mechanical;
     private UUID owner;
     private ItemStack carrier = ItemStack.EMPTY;
     private List<ItemStack> modules =
@@ -46,9 +46,20 @@ public final class CampBlockEntity extends BlockEntity {
     private List<BlockPos> supports = List.of();
     private final Map<BlockPos, BlockState> originals = new LinkedHashMap<>();
     private CampPlan plan;
+    private CampMenu editor;
+    private CampMechanism mechanism;
+    private AABB siteBounds;
 
     public CampBlockEntity(BlockPos pos, BlockState state) {
         super(MobileCamp.CORE.get(), pos, state);
+    }
+
+    /** effects: distinguishes real-piston camps from legacy in-flight saves. */
+    public boolean mechanical() { return mechanical; }
+
+    private CampMechanism mechanism() {
+        if (mechanism == null) mechanism = new CampMechanism(this);
+        return mechanism;
     }
 
     public Phase phase() {
@@ -102,7 +113,8 @@ public final class CampBlockEntity extends BlockEntity {
         plan = new CampPlan(modules, turns());
         owner = player.getUUID();
         supports = site.supports();
-        var volume = new ArrayList<>(CampPlan.volume(worldPosition, turns()));
+        mechanical = true;
+        var volume = new ArrayList<>(CampMechanism.volume(worldPosition, turns()));
         volume.addAll(supports);
         for (var pos : volume)
             if (!pos.equals(worldPosition)) originals.put(pos, server.getBlockState(pos));
@@ -144,10 +156,12 @@ public final class CampBlockEntity extends BlockEntity {
             message(player, "occupied");
             return;
         }
+        if (editor != null) { message(player, "editing"); return; }
         captureCargo();
         phase = Phase.FOLDING;
         progress = Shelter.DURATION;
-        CampSites.edit(
+        if (mechanical) mechanism().prepareFolding();
+        else CampSites.edit(
                 () -> {
                     for (var cell : plan().cells()) {
                         var pos = worldPosition.offset(cell.offset());
@@ -165,6 +179,62 @@ public final class CampBlockEntity extends BlockEntity {
         sound(SoundEvents.IRON_TRAPDOOR_CLOSE, 0.7f);
     }
 
+    /** requires: server player; effects: opens one deployed-module editor when safe. */
+    public void openModules(Player player) {
+        if (!canEditModules(player)) return;
+        if (editor != null) { message(player, "editing"); return; }
+        captureCargo();
+        player.openMenu(new net.minecraft.world.SimpleMenuProvider((id, inventory, p) -> {
+            editor = new CampMenu(id, inventory, this);
+            return editor;
+        }, Component.translatable("container.mobilecamp.modules")));
+    }
+
+    /** effects: validates authority, range, loaded terrain and clear interior. */
+    boolean canEditModules(Player player) {
+        if (!initialized || isRemoved() || phase != Phase.ACTIVE) { message(player,"transforming"); return false; }
+        if (!player.getUUID().equals(owner) && !player.hasPermissions(2)) { message(player,"not_owner"); return false; }
+        if (player.level() != level || player.distanceToSqr(worldPosition.getCenter()) > 64) return false;
+        if (!loaded()) { message(player,"wait_loaded"); return false; }
+        if (occupied()) { message(player,"occupied"); return false; }
+        return true;
+    }
+
+    /** requires: authorized server menu click; effects: snapshots live station cargo. */
+    List<ItemStack> editingModules() {
+        captureCargo();
+        return modules.stream().map(ItemStack::copy).toList();
+    }
+
+    /** requires: validated menu click, four valid bay stacks; effects: atomically replaces
+     * stations, preserving their cargo without loose drops or shell changes. */
+    void applyModules(List<ItemStack> replacements) {
+        var next = replacements.stream().map(ItemStack::copy).toList();
+        boolean changed = false;
+        for (int i=0; i<4; i++) changed |= !ItemStack.matches(next.get(i),modules.get(i));
+        if (!changed) return;
+        var nextPlan = new CampPlan(next,turns());
+        CampSites.edit(() -> {
+            for (var cell : plan().cells()) if (cell.bay() >= 0) {
+                var pos = worldPosition.offset(cell.offset());
+                if (level.getBlockEntity(pos) instanceof Container container) container.clearContent();
+                level.removeBlockEntity(pos);
+                level.setBlock(pos,Blocks.AIR.defaultBlockState(),18);
+            }
+            modules = next;
+            CampCargo.write(carrier, modules, level.registryAccess());
+            plan = nextPlan;
+            for (var cell : plan.cells()) if (cell.bay() >= 0) placeCell(cell);
+        });
+        for (var cell : plan.cells()) if (cell.bay() >= 0) {
+            var pos = worldPosition.offset(cell.offset());
+            level.updateNeighborsAt(pos,level.getBlockState(pos).getBlock());
+        }
+        sync();
+    }
+
+    /** effects: releases only this menu's editor lease. */
+    void closeModules(CampMenu menu) { if (editor == menu) editor = null; }
     private void captureCargo() {
         var cargo = new CompoundTag[4];
         for (int i = 0; i < 4; i++) cargo[i] = new CompoundTag();
@@ -206,12 +276,7 @@ public final class CampBlockEntity extends BlockEntity {
         CampCargo.write(carrier, modules, level.registryAccess());
     }
 
-    private void deploy() {
-        CampSites.edit(
-                () -> {
-                    for (var pos : supports)
-                        level.setBlock(pos, MobileCamp.FRAME.get().defaultBlockState(), 18);
-                    for (var cell : plan().cells()) {
+    private void placeCell(CampPlan.Cell cell) {
                         var pos = worldPosition.offset(cell.offset());
                         var state = cell.state();
                         var entry =
@@ -235,6 +300,15 @@ public final class CampBlockEntity extends BlockEntity {
                                     entry.getCompound("Entity"), level.registryAccess());
                             entity.setChanged();
                         }
+    }
+
+    private void deploy() {
+        CampSites.edit(
+                () -> {
+                    for (var pos : supports)
+                        level.setBlock(pos, MobileCamp.DECK.get().defaultBlockState(), 18);
+                    for (var cell : plan().cells()) {
+                        placeCell(cell);
                     }
                 });
         phase = Phase.ACTIVE;
@@ -281,16 +355,19 @@ public final class CampBlockEntity extends BlockEntity {
     }
 
     public AABB bounds() {
-        var positions = CampPlan.volume(worldPosition, turns());
+        if (siteBounds != null) return siteBounds;
+        var positions = mechanical ? CampMechanism.volume(worldPosition, turns()) : CampPlan.volume(worldPosition, turns());
         var a = positions.getFirst();
         var b = positions.getLast();
-        return new AABB(
+        int bottom = supports.stream().mapToInt(BlockPos::getY).min().orElse(worldPosition.getY());
+        siteBounds = new AABB(
                 Math.min(a.getX(), b.getX()),
-                worldPosition.getY(),
+                bottom,
                 Math.min(a.getZ(), b.getZ()),
                 Math.max(a.getX(), b.getX()) + 1,
                 worldPosition.getY() + Shelter.HEIGHT,
                 Math.max(a.getZ(), b.getZ()) + 1);
+        return siteBounds;
     }
 
     private boolean occupied() {
@@ -320,11 +397,9 @@ public final class CampBlockEntity extends BlockEntity {
                                 Shelter.DURATION);
             return;
         }
-        boolean pause =
-                !camp.loaded()
-                        || (camp.phase == Phase.DEPLOYING
-                                && camp.progress >= Shelter.DURATION - 1
-                                && camp.occupied());
+        boolean pause = !camp.loaded()
+                || (camp.mechanical ? camp.occupied()
+                    : camp.phase == Phase.DEPLOYING && camp.progress >= Shelter.DURATION-1 && camp.occupied());
         if (camp.paused != pause) {
             camp.paused = pause;
             camp.sync();
@@ -332,7 +407,21 @@ public final class CampBlockEntity extends BlockEntity {
         if (pause) return;
         camp.progress += camp.phase == Phase.FOLDING ? -1 : 1;
         camp.setChanged();
-        if (camp.progress % 20 == 0)
+        if (camp.mechanical) {
+            int elapsed = camp.phase == Phase.FOLDING ? Shelter.DURATION-camp.progress : camp.progress;
+            if (!camp.mechanism().tick(elapsed, camp.phase == Phase.FOLDING)) {
+                var player = level.getPlayerByUUID(camp.owner);
+                if (player != null) message(player, "mechanism_blocked");
+                CampSites.edit(() -> {
+                    for (var location : camp.originals.keySet()) if (!location.equals(pos)) {
+                        if (level.getBlockEntity(location) instanceof Container container) container.clearContent();
+                        level.removeBlockEntity(location);
+                    }
+                });
+                camp.finishPacking();
+                return;
+            }
+        } else if (camp.progress % 20 == 0)
             camp.sound(SoundEvents.PISTON_EXTEND, .6f + camp.progress / 320f);
         if (camp.phase == Phase.DEPLOYING && camp.progress >= Shelter.DURATION) camp.deploy();
         else if (camp.phase == Phase.FOLDING && camp.progress <= 0) camp.finishPacking();
@@ -363,6 +452,7 @@ public final class CampBlockEntity extends BlockEntity {
 
     private void writeVisual(CompoundTag tag) {
         tag.putBoolean("Initialized", initialized);
+        tag.putBoolean("Mechanical", mechanical);
         tag.putString("Phase", phase.name());
         tag.putInt("Progress", progress);
         tag.putBoolean("Paused", paused);
@@ -383,6 +473,7 @@ public final class CampBlockEntity extends BlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         initialized = tag.getBoolean("Initialized");
+        mechanical = tag.getBoolean("Mechanical");
         phase = tag.contains("Phase") ? Phase.valueOf(tag.getString("Phase")) : Phase.DEPLOYING;
         progress = Math.clamp(tag.getInt("Progress"), 0, Shelter.DURATION);
         paused = tag.getBoolean("Paused");
@@ -416,6 +507,8 @@ public final class CampBlockEntity extends BlockEntity {
             modules = stacks;
         }
         plan = null;
+        mechanism = null;
+        siteBounds = null;
     }
 
     @Override

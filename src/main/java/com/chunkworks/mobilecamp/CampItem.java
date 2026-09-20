@@ -3,6 +3,7 @@ package com.chunkworks.mobilecamp;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -26,8 +27,16 @@ public final class CampItem extends BlockItem {
         super(block, new Item.Properties().stacksTo(1));
     }
 
+    /**
+     * effects: the server validates and places the complete camp; the client only
+     * acknowledges the click. Rejection retains the carrier and all nested cargo.
+     */
     @Override
     public InteractionResult place(BlockPlaceContext context) {
+        // A client cannot validate ownership or the full reserved site. Vanilla
+        // BlockItem prediction consumes its stack before a server-only rejection,
+        // and unchanged server inventory otherwise produces no correction packet.
+        if (context.getLevel().isClientSide) return InteractionResult.SUCCESS;
         if (context.getLevel() instanceof ServerLevel level) {
             if (context.getPlayer() == null) return InteractionResult.FAIL;
             var active = CampOwners.get(level).active(context.getPlayer().getUUID());
@@ -42,7 +51,7 @@ public final class CampItem extends BlockItem {
                                         p.getY(),
                                         p.getZ()),
                                 true);
-                return InteractionResult.FAIL;
+                return reject(context);
             }
             var site =
                     CampSite.inspect(
@@ -52,15 +61,25 @@ public final class CampItem extends BlockItem {
             if (site.failure() != null) {
                 if (context.getPlayer() != null)
                     context.getPlayer().displayClientMessage(site.failure(), true);
-                return InteractionResult.FAIL;
+                return reject(context);
             }
         }
         ORIGINAL.set(context.getLevel().getBlockState(context.getClickedPos()));
         try {
-            return super.place(context);
+            var result = super.place(context);
+            return result == InteractionResult.FAIL ? reject(context) : result;
         } finally {
             ORIGINAL.remove();
         }
+    }
+
+    private static InteractionResult reject(BlockPlaceContext context) {
+        // Also repair prediction from clients still running the previous version.
+        // Force the authoritative inventory, including the offhand and components;
+        // diff-only broadcastChanges sees no change on a rejected placement.
+        if (context.getPlayer() instanceof ServerPlayer player)
+            player.inventoryMenu.sendAllDataToRemote();
+        return InteractionResult.FAIL;
     }
 
     @Override

@@ -1,0 +1,36 @@
+{
+  "variants": {
+    "facing=south,part=head": {
+      "model": "mobilecamp:block/bedroll_head",
+      "y": 0
+    },
+    "facing=south,part=foot": {
+      "model": "mobilecamp:block/bedroll_foot",
+      "y": 0
+    },
+    "facing=west,part=head": {
+      "model": "mobilecamp:block/bedroll_head",
+      "y": 90
+    },
+    "facing=west,part=foot": {
+      "model": "mobilecamp:block/bedroll_foot",
+      "y": 90
+    },
+    "facing=north,part=head": {
+      "model": "mobilecamp:block/bedroll_head",
+      "y": 180
+    },
+    "facing=north,part=foot": {
+      "model": "mobilecamp:block/bedroll_foot",
+      "y": 180
+    },
+    "facing=east,part=head": {
+      "model": "mobilecamp:block/bedroll_head",
+      "y": 270
+    },
+    "facing=east,part=foot": {
+      "model": "mobilecamp:block/bedroll_foot",
+      "y": 270
+    }
+  }
+}

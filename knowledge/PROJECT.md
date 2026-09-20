@@ -1,68 +1,68 @@
 # C.A.M.P.
 
-First playable release, Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21.
-Repository: `minecraft-mobile-camp`; mod id and artifact name: `mobilecamp`.
-Version 0.1.0 is the first playable release. On 2026-09-20 Rusty explicitly requested
-release, then directed a warning before disconnecting online players for the restart.
-They extended the original 120-second countdown to five minutes. The countdown was
-subsequently paused for inventory recovery, then restarted with a fresh five-minute
-server announcement. This authorizes publication, the pack update and the warned
-restart, superseding the earlier release hold and empty-server-only restart condition
-for this deployment. The live pack was verified as 1.50.1; C.A.M.P. is published in 1.51.0.
-Unrelated unreleased changes remain held.
+Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21.
+Repository: minecraft-mobile-camp; mod id and artifact: mobilecamp.
 
-Deployment completed on 2026-09-20 after the renewed five-minute warning. The server
-loaded C.A.M.P. 0.1.0, matched published pack 1.51.0, and reported 20 TPS with players
-reconnected. See [release verification](../devtools/verification/release-0.1.0.md).
+## Current work
 
-## Product and decisions
+Version 0.2.0 is implemented locally for the authorized combined release with
+Schnappviecher 0.1.1. Publication and deployment have not yet occurred.
+Rusty's latest restart instruction is a **120-second warning**, including
+disconnecting online players after that warning. This supersedes the earlier
+five-minute countdown and empty-server-only condition for this deployment.
+No countdown has been started. Unrelated held mod changes remain held.
 
-The accepted brief is [D-0001](decisions/D-0001.md): a rugged, mechanically unfolding
-designed shelter with attached modular equipment, mixing a closed rear room and
-covered outdoor workshop. [D-0002](decisions/D-0002.md) adds the single deployed camp
-limit and exterior collapse control, and identifies delegated implementation defaults.
+[D-0001](decisions/D-0001.md) defines the designed expedition shelter and attached
+equipment. [D-0002](decisions/D-0002.md) sets the single deployed camp and collapse
+control. [D-0003](decisions/D-0003.md) records the requested physical pistons,
+full foundations, blue module control, bedroll and placement-loss correction.
 
 ## Implementation
 
-- 8x8 platform, six-block site clearance for a pitched canvas roof. Reinforced wood
-  panels, telescoping metal posts, hinged deck and roof wings, and staged mechanical
-  sounds. Transformation takes eight seconds in each direction.
-- Sleeping, double-chest storage, crafting and cooking bays; a field kitchen adds a
-  smoker. Equipment becomes actual vanilla blocks when deployment finishes.
-- Nested module cargo preserves both chest halves and block-entity state. Module
-  swaps occur in the packed item's screen and persist immediately.
-- An overworld ownership ledger enforces one deployed camp per player across all
-  dimensions. Per-dimension reservations protect the complete camp site, even if its
-  anchor is unloaded. Cancelled NeoForge placement rolls back both ledgers.
-- Core right-click or mining requests collapse. Owner/operator only, with a clear
-  interior. The packed camp is dropped only after terrain restoration.
-- Solid obstructions, fluids, block entities, overlaps and unloaded sites refuse
-  placement without spending the item. Small plants and flowers are restored on
-  packing. Four corner supports bridge gaps up to three blocks.
-- Block-entity persistence stores transformation progress and site state. Operations
-  pause if the reserved site is unloaded. No forced chunk loading or idle camp work.
+- 8x8 camp inside a reserved 10x8x6 mechanism volume. Real redstone-powered vanilla
+  pistons move both wings in five layers during the eight-second deployment and
+  folding sequence. Fixed parts and equipment are stored/installed by the core.
+- Grounded deck with foundation columns under the whole footprint, bridging at
+  most three blocks. Static asset audit reduced 341 coplanar overlaps to zero.
+- Separate blue module control opens the deployed editor on ordinary right-click.
+  A single editor lease prevents conflicting collapse; actual slots enforce bay
+  compatibility. Module removal/reinsertion retains live station cargo.
+- Bedroll permits sleep without changing respawn. Legacy camp beds are protected;
+  ordinary beds still set spawn. Unsafe dimensions refuse sleep without explosion.
+- Rejected placement retains the entire packed item. Clients do not pre-consume it;
+  the server explicitly resends unchanged inventory on site/ownership rejection.
+- Craftable, independently placeable structural blocks and module mounts support
+  manual piston builds. The core provides automatic equipment and cargo handling.
+- Ownership and site ledgers persist across dimensions and unloaded camps.
+  External piston moves remain prohibited. Occupied or unloaded sites pause.
+  Cancelled internal strokes restore terrain and return one cargo-bearing pickup.
+- Legacy saves finish their old transaction and adopt the new mechanism on
+  redeployment. No forced rewrite of an occupied existing camp.
 
-## Current design discussion
+## Verification
 
-Crafting balance remains open. The prototype directly crafts a complete camp with
-two iron blocks, piston, two chests, green bed, crafting table, furnace and leather.
-Its separate module recipes currently cost their representative station plus four
-iron ingots and leather. These are implementation placeholders.
+Four domain tests and sixteen real-server GameTests passed locally, including
+real inventory packets, both hands, module controls, night sleep, every mechanical
+stroke in both directions, core reload during motion, occupied actuator strips
+and cancelled-piston recovery. The standalone model audit passes over 28 models
+and passes mypy --strict. The shader/client booth also passed, including survival rejection, deployed module
+exchange and actual collapse packets. Rendered close-ups were inspected.
+See devtools/verification/0.2.0.md for the final evidence and limitations.
 
-The proposed replacement crafts a chassis from four prebuilt starter modules,
-two iron blocks, a piston and leather. Each module uses the actual equipment plus
-two iron ingots and leather; the sleeping recipe accepts any bed, cooking requires
-both furnace and campfire, and field kitchen requires furnace, smoker and campfire.
-Do not treat this discussion as a finalized balance decision.
+## Crafting balance
 
-## Verification and remaining review
+Prototype complete-camp and module recipes remain. New independently craftable
+structural parts have provisional recipes described in the README.
+The proposed chassis-from-four-modules recipe and reduced module iron cost remain
+discussion, not an accepted crafting overhaul.
 
-See `devtools/verification/first-playable.md` for tests run and visual evidence.
-The first visual pass found missing bed/chest module icons and an overly plain shell;
-those were revised before the final pass. Playtest feedback still governs the artistic
-direction and crafting economy. Do not describe source compilation alone as a playtest.
+The Java module API requires stable part coordinates because cargo is keyed by
+them. There is no migration framework for incompatible add-on module revisions.
+Wider cross-mod and natural chunk-unload/restart playtesting remain useful beyond
+the isolated real-server regressions.
 
-The module API requires compatible part coordinates across definition changes;
-there is no migration system for incompatible add-on module revisions yet. Natural
-long-running chunk-unload/restart recovery and cross-mod compatibility deserve wider
-playtesting beyond the isolated persistence and cancellation tests.
+## Released history
+
+0.1.0 was released and deployed on 2026-09-20 in pack 1.51.0 after the then-requested
+five-minute warning. The server loaded the matching artifact and reported 20 TPS.
+See [release verification](../devtools/verification/release-0.1.0.md).

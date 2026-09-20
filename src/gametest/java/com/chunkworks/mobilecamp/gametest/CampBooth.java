@@ -31,6 +31,7 @@ public final class CampBooth {
     private static final Logger LOG = LoggerFactory.getLogger("C.A.M.P. booth");
     private static final BlockPos CORE = new BlockPos(0, 100, 0);
     private static int tick;
+    private static int rejectionTick;
 
     @SubscribeEvent
     public static void tick(ClientTickEvent.Post event) {
@@ -38,8 +39,9 @@ public final class CampBooth {
         var mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
         if (mc.screen instanceof PauseScreen) mc.setScreen(null);
-        tick++;
         try {
+            if (!rejectionGate(mc)) return;
+            tick++;
             switch (tick) {
                 case 20 ->
                         server(
@@ -70,7 +72,7 @@ public final class CampBooth {
                                     p.getInventory().clearContent();
                                     p.setItemInHand(
                                             InteractionHand.MAIN_HAND,
-                                            new ItemStack(MobileCamp.CAMP_ITEM.get()));
+                                            PlacementGameTests.ladenCamp(l.registryAccess()));
                                     view(p, .5, 100, -2.5, .5, 100, .5);
                                 });
                 case 70 -> {
@@ -103,19 +105,56 @@ public final class CampBooth {
                             "client sees fully deployed camp");
                     photo(mc, "06-camp-complete");
                 }
-                case 320 -> server(mc, p -> view(p, 2.5, 101, 11, .5, 102, 3));
-                case 360 -> photo(mc, "07-workshop-front");
-                case 380 -> server(mc, p -> view(p, .5, 101, 2.8, 2.8, 101.6, 1));
-                case 415 -> photo(mc, "08-bedroom-storage");
-                case 440 ->
+                case 305 -> server(mc, p -> view(p, 6, 106, 1, 3, 105, 1));
+                case 345 -> photo(mc, "13-roof-eave-joint");
+                case 360 -> server(mc, p -> view(p, 2.5, 101, 11, .5, 102, 3));
+                case 400 -> photo(mc, "07-workshop-front");
+                case 420 -> server(mc, p -> view(p, .5, 101, 2.8, 2.8, 101.6, 1));
+                case 455 -> photo(mc, "08-bedroom-storage");
+                case 460 -> server(mc, p -> view(p, .5, 101, 2.8, -2, 101.4, 1.5));
+                case 495 -> photo(mc, "15-bedroll");
+                case 515 -> server(mc, p -> {
+                    view(p, 1.5, 100, -2.5, 1.5, 100.5, .5);
+                    p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                });
+                case 530 -> mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND,
+                        new BlockHitResult(Vec3.atCenterOf(CORE.east()).add(0,0,-.5),
+                                Direction.NORTH, CORE.east(), false));
+                case 545 -> {
+                    verdict(mc.player.containerMenu instanceof CampMenu, "ordinary deployed-control click opens modules");
+                    mc.options.hideGui = false;
+                    photo(mc, "14-deployed-module-control");
+                }
+                case 550 -> mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,
+                        1, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
+                case 560 -> {
+                    verdict(mc.player.containerMenu.getCarried().is(MobileCamp.STORAGE.get()),
+                            "real menu click removes storage module");
+                    server(mc, p -> verdict(p.serverLevel().getBlockEntity(CORE.offset(2,1,1)) == null,
+                            "module removal detaches actual chest"));
+                }
+                case 570 -> mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,
+                        1, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
+                case 580 -> {
+                    verdict(mc.player.containerMenu.getCarried().isEmpty(), "module reinserted through client packet");
+                    server(mc, p -> {
+                        var chest=(net.minecraft.world.level.block.entity.ChestBlockEntity)
+                                p.serverLevel().getBlockEntity(CORE.offset(2,1,1));
+                        verdict(chest != null && chest.getItem(8).is(net.minecraft.world.item.Items.DIAMOND)
+                                && chest.getItem(8).getCount()==17, "deployed module exchange preserves live cargo");
+                    });
+                    mc.player.closeContainer();
+                    mc.options.hideGui = true;
+                }
+                case 630 ->
                         server(
                                 mc,
                                 p -> {
                                     view(p, .5, 100, -2.5, .5, 100.5, .5);
                                     p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                                 });
-                case 475 -> photo(mc, "09-collapse-button");
-                case 490 ->
+                case 665 -> photo(mc, "09-collapse-button");
+                case 680 ->
                         mc.gameMode.useItemOn(
                                 mc.player,
                                 InteractionHand.MAIN_HAND,
@@ -124,9 +163,9 @@ public final class CampBooth {
                                         Direction.NORTH,
                                         CORE,
                                         false));
-                case 505 -> server(mc, p -> view(p, 12, 106, 15, .5, 101.8, 3.5));
-                case 550 -> photo(mc, "10-collapsing");
-                case 690 -> {
+                case 695 -> server(mc, p -> view(p, 12, 106, 15, .5, 101.8, 3.5));
+                case 740 -> photo(mc, "10-collapsing");
+                case 880 -> {
                     photo(mc, "11-packed-pickup");
                     server(
                             mc,
@@ -151,19 +190,19 @@ public final class CampBooth {
                                 view(p, .5, 100, -2.5, .5, 100, .5);
                             });
                 }
-                case 720 -> {
+                case 910 -> {
                     mc.options.hideGui = false;
                     mc.options.keyShift.setDown(true);
                 }
-                case 740 -> mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
-                case 770 -> {
+                case 930 -> mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
+                case 960 -> {
                     verdict(
                             mc.player.containerMenu instanceof CampMenu,
                             "sneak-use opens real synchronized module menu");
                     photo(mc, "12-module-bays");
                     mc.options.keyShift.setDown(false);
                 }
-                case 800 -> {
+                case 990 -> {
                     mc.player.closeContainer();
                     LOG.info("camp booth: COMPLETE");
                     mc.stop();
@@ -174,6 +213,62 @@ public final class CampBooth {
             LOG.error("camp booth: FAIL", error);
             mc.stop();
         }
+    }
+
+    private static boolean rejectionGate(Minecraft mc) {
+        // Survival is essential: creative prediction restores the item count and
+        // concealed this regression in the original booth.
+        if (rejectionTick >= 480) return true;
+        int scenario = rejectionTick / 80;
+        int step = rejectionTick++ % 80;
+        var hand = scenario < 3 ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+        if (step == 0) server(mc, p -> {
+            var level = p.serverLevel();
+            level.getGameRules().getRule(GameRules.RULE_DOMOBSPAWNING).set(false, level.getServer());
+            level.setDayTime(1800);
+            p.setGameMode(GameType.SURVIVAL);
+            p.getInventory().clearContent();
+            for (int x = -14; x <= 17; x++)
+                for (int z = -12; z <= 20; z++) {
+                    level.setBlock(new BlockPos(x, 99, z), Blocks.STONE.defaultBlockState(), 3);
+                    for (int y = 100; y <= 110; y++)
+                        level.setBlock(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState(), 3);
+                }
+            level.setBlock(CORE.offset(3, 1, 5),
+                    (scenario % 3 == 0 ? Blocks.STONE : scenario % 3 == 1 ? Blocks.WATER
+                            : Blocks.AIR).defaultBlockState(), 3);
+            if (scenario % 3 == 2)
+                for (int depth = 1; depth <= 4; depth++)
+                    level.setBlock(CORE.offset(-3, -depth, 0), Blocks.AIR.defaultBlockState(), 3);
+            p.setItemInHand(hand, PlacementGameTests.ladenCamp(level.registryAccess()));
+            view(p, .5, 100, -2.5, .5, 100, .5);
+            p.inventoryMenu.sendAllDataToRemote();
+        });
+        if (step == 30) {
+            mc.player.setYRot(0);
+            var expected = mc.player.getItemInHand(hand).copy();
+            verdict(expected.is(MobileCamp.CAMP_ITEM.get()), "survival rejection fixture synchronized");
+            mc.gameMode.useItemOn(mc.player, hand,
+                    new BlockHitResult(Vec3.atCenterOf(CORE.below()).add(0, .5, 0),
+                            Direction.UP, CORE.below(), false));
+            verdict(ItemStack.matches(expected, mc.player.getItemInHand(hand)),
+                    "client prediction never consumes packed camp: " + scenario);
+        }
+        if (step == 60) {
+            verdict(ItemStack.matches(mc.player.getItemInHand(hand),
+                            PlacementGameTests.ladenCamp(mc.level.registryAccess())),
+                    "rejected camp and nested cargo stay visible: " + scenario);
+            verdict(!mc.level.getBlockState(CORE).is(MobileCamp.CAMP.get()),
+                    "rejected site has no ghost core");
+            server(mc, p -> {
+                verdict(ItemStack.matches(p.getItemInHand(hand),
+                                PlacementGameTests.ladenCamp(p.serverLevel().registryAccess())),
+                        "rejection preserves authoritative camp and cargo");
+                verdict(CampOwners.get(p.serverLevel()).active(p.getUUID()) == null,
+                        "rejection leaves ownership free");
+            });
+        }
+        return false;
     }
 
     private static void server(Minecraft mc, Consumer<ServerPlayer> action) {

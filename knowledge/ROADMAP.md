@@ -1,30 +1,16 @@
-# First playable C.A.M.P.
+# C.A.M.P. roadmap
 
-The accepted product brief is D-0001. Rusty subsequently asked to continue development
-without routine approval interruptions; the implementation defaults below are chosen
-under that delegation and remain subject to the playtest.
+The first playable release established the designed expedition shelter, one deployed
+camp per owner, attached module cargo and a portable pickup.
 
-1. An 8 by 8 platform, with six blocks of clearance for a pitched roof, a closed rear room and
-   covered front workshop. Four bays: sleeping, storage, crafting and cooking.
-2. A placed crate unfolds automatically; the exterior red switch or mining the core
-   packs the camp into one item. One deployed camp per player across all dimensions.
-   Everyone steps outside before owner/operator retraction. Equipment remains attached and usable.
-3. All four bays are equipped in the starter item. Sneak-use the packed item to exchange
-   modules; the first upgrade adds a smoker to the cooking bay. Module cargo travels
-   with that module and keeps both halves of a double chest and furnace state.
-4. Clear terrain only: refuse solid obstructions, liquids and existing block entities.
-   Corner supports bridge small gaps, up to three blocks. Preserve displaced vegetation
-   and restore the site when packing; never capture player-built blocks as cargo.
-5. Save transformation progress and ownership. Pause at unloaded chunk boundaries;
-   resume after reload. Protect attached blocks from separate harvesting or piston moves.
-6. Choreograph supports, extending/hinged floor sections, walls, equipment and canvas
-   roof. Reverse the sequence to pack. Coordinate existing mechanical game sounds.
-7. Verify JDK-only layout/state rules, actual server placement/interaction/packing,
-   inventories, interruptions and module exchange, then review the rendered transformation
-   in the single permitted client with a muted booth.
+The authorized 0.2.0 update implements [D-0003](decisions/D-0003.md):
+real piston wings and module mounts, full ground contact, corrected model geometry,
+ordinary right-click deployed module access, spawn-preserving bedrolls and safe
+rejected placement. Verification and combined release are the current work.
 
-Rusty authorized release and the pack update on 2026-09-20, extending the restart
-warning from 120 seconds to five minutes before disconnecting players. After an
-inventory-recovery pause, a fresh five-minute warning was announced. The bed uses normal position-based
-respawn behavior: sleep after moving camp to set the new location. Inventory and cooking
-state are preserved in transit; cooking does not continue while packed.
+Next: playtest the physical sequence and crafting balance, review module additions,
+and exercise wider cross-mod and natural chunk-unload/restart scenarios.
+A module-first camp crafting recipe remains a discussion, not a finalized change.
+
+Release uses the latest requested **two-minute server warning**. Historical
+five-minute countdowns applied to the already-completed 0.1.0 deployment.

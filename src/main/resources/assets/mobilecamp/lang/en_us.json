@@ -18,13 +18,18 @@
   "camp.mobilecamp.bay.3": "Cooking module",
   "camp.mobilecamp.item_hint": "Place to unfold. Sneak-use in the air to change modules.",
   "camp.mobilecamp.already_deployed": "You already have a C.A.M.P. in %s at %s, %s, %s. Pack it first.",
-  "camp.mobilecamp.blocked": "C.A.M.P. needs clear 8\u00d78 space. Obstruction at %s, %s, %s.",
+  "camp.mobilecamp.blocked": "C.A.M.P. needs clear 10×8 space, including its folding machinery. Obstruction at %s, %s, %s.",
   "camp.mobilecamp.unloaded": "C.A.M.P. site is outside loaded terrain or the world boundary at %s, %s, %s.",
   "camp.mobilecamp.footing": "No stable footing within three blocks at %s, %s, %s.",
-  "camp.mobilecamp.occupied": "Clear the camp before folding: a player or creature is still inside.",
-  "camp.mobilecamp.not_owner": "Only this camp\u2019s owner or an operator can collapse it.",
+  "camp.mobilecamp.occupied": "Clear the camp before changing modules or folding: a player or creature is still inside.",
+  "camp.mobilecamp.not_owner": "Only this camp’s owner or an operator can operate its controls.",
   "camp.mobilecamp.transforming": "C.A.M.P. is transforming. Keep the interior clear.",
   "camp.mobilecamp.wait_loaded": "Move closer so the entire camp is loaded before folding.",
-  "camp.mobilecamp.attached": "Attached equipment. Use the core\u2019s red collapse button, then change modules while packed.",
-  "camp.mobilecamp.no_sleep": "This dimension is unsafe for sleeping. The attached bed stays protected."
+  "camp.mobilecamp.attached": "Attached equipment. Use the blue module control to change modules or the red switch to pack up.",
+  "camp.mobilecamp.no_sleep": "This dimension is unsafe for sleeping. The bedroll stays protected.",
+  "block.mobilecamp.module_control": "C.A.M.P. Module Control",
+  "block.mobilecamp.bedroll": "Expedition Bedroll",
+  "camp.mobilecamp.editing": "Close the module screen before packing the camp.",
+  "camp.mobilecamp.mechanism_blocked": "A piston could not complete its stroke. Your C.A.M.P. has packed itself back up.",
+  "block.mobilecamp.module_mount": "Expedition Module Mount"
 }

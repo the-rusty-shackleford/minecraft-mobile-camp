@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NIN",
+    " D "
+  ],
+  "key": {
+    "N": {
+      "item": "minecraft:iron_nugget"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "D": {
+      "item": "mobilecamp:deck"
+    }
+  },
+  "result": {
+    "id": "mobilecamp:module_mount",
+    "count": 1
+  }
+}

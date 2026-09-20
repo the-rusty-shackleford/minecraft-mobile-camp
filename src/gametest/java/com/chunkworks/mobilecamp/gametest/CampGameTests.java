@@ -77,7 +77,7 @@ public final class CampGameTests {
                             "deployment completed on real ticks");
                     h.assertBlockPresent(Blocks.CRAFTING_TABLE, ANCHOR.offset(-2, 1, 5));
                     h.assertBlockPresent(Blocks.FURNACE, ANCHOR.offset(3, 1, 5));
-                    h.assertBlockPresent(Blocks.GREEN_BED, ANCHOR.offset(-2, 1, 1));
+                    h.assertBlockPresent(MobileCamp.BEDROLL.get(), ANCHOR.offset(-2, 1, 1));
                     var chest =
                             (ChestBlockEntity)
                                     h.getLevel()
@@ -228,7 +228,8 @@ public final class CampGameTests {
     @GameTest(template = "arena", timeoutTicks = 30)
     public void cancelledPlacementRestoresTerrainAndOwnership(GameTestHelper h) {
         var p = prepare(h);
-        var stack = new ItemStack(MobileCamp.CAMP_ITEM.get());
+        var stack = PlacementGameTests.ladenCamp(h);
+        var expected = stack.copy();
         Consumer<BlockEvent.EntityPlaceEvent> reject =
                 e -> {
                     if (e.getEntity() == p) e.setCanceled(true);
@@ -240,9 +241,9 @@ public final class CampGameTests {
                     "placement event cancelled");
             h.assertBlockNotPresent(MobileCamp.CAMP.get(), ANCHOR);
             h.assertTrue(
-                    stack.getCount() == 1
+                    ItemStack.matches(expected, stack)
                             && CampOwners.get(h.getLevel()).active(p.getUUID()) == null,
-                    "cancel keeps item and releases ownership");
+                    "cancel keeps exact item, modules and cargo and releases ownership");
             h.assertTrue(
                     CampSites.get(h.getLevel()).owner(h.absolutePos(ANCHOR)) == null,
                     "cancel releases site");
@@ -373,7 +374,7 @@ public final class CampGameTests {
                 175,
                 () -> {
                     h.assertBlockPresent(Blocks.SMOKER, ANCHOR.offset(2, 1, 5));
-                    h.assertBlockPresent(MobileCamp.FRAME.get(), ANCHOR.offset(-3, -1, 0));
+                    h.assertBlockPresent(MobileCamp.DECK.get(), ANCHOR.offset(-3, -1, 0));
                     button(h, p);
                 });
         h.runAtTickTime(

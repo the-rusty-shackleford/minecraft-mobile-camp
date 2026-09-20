@@ -16,6 +16,18 @@ public final class CampProtection {
     private CampProtection() {}
 
     @SubscribeEvent
+    public static void preserveSpawn(net.neoforged.neoforge.event.entity.player.PlayerSetSpawnEvent event) {
+        if (event.isForced() || event.getNewSpawn() == null || event.getEntity().getServer() == null) return;
+        var level = event.getEntity().getServer().getLevel(event.getSpawnLevel());
+        if (level == null || !level.hasChunkAt(event.getNewSpawn())) return;
+        var state = level.getBlockState(event.getNewSpawn());
+        // Legacy deployed camps are covered until their next packing/redeployment.
+        if (state.getBlock() instanceof BedrollBlock
+                || state.getBlock() instanceof BedBlock && CampSites.get(level).owner(event.getNewSpawn()) != null)
+            event.setCanceled(true);
+    }
+
+    @SubscribeEvent
     public static void mine(BlockEvent.BreakEvent event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         var owner = CampSites.get(level).owner(event.getPos());
@@ -37,6 +49,7 @@ public final class CampProtection {
 
     @SubscribeEvent
     public static void piston(PistonEvent.Pre event) {
+        if (CampSites.editing()) return;
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         var sites = CampSites.get(level);
         var resolver = event.getStructureHelper();
@@ -67,6 +80,12 @@ public final class CampProtection {
             if (anchor.equals(event.getPos())) {
                 if (event.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND)
                     camp.requestPack(event.getEntity());
+                event.setCanceled(true);
+                event.setCancellationResult(InteractionResult.SUCCESS);
+                return;
+            }
+            if (level.getBlockState(event.getPos()).is(MobileCamp.CONTROL.get())) {
+                if (event.getHand() == net.minecraft.world.InteractionHand.MAIN_HAND) camp.openModules(event.getEntity());
                 event.setCanceled(true);
                 event.setCancellationResult(InteractionResult.SUCCESS);
                 return;

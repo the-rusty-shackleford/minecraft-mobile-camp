@@ -47,7 +47,7 @@ public final class CampRenderer implements BlockEntityRenderer<CampBlockEntity> 
             MultiBufferSource buffers,
             int light,
             int overlay) {
-        if (camp.phase() == CampBlockEntity.Phase.ACTIVE) return;
+        if (camp.mechanical() || camp.phase() == CampBlockEntity.Phase.ACTIVE) return;
         double ticks =
                 camp.progress()
                         + (camp.paused()
@@ -127,7 +127,7 @@ public final class CampRenderer implements BlockEntityRenderer<CampBlockEntity> 
                 pose.translate(off.getX(), off.getY() * legs, off.getZ());
                 context.getBlockRenderDispatcher()
                         .renderSingleBlock(
-                                MobileCamp.FRAME.get().defaultBlockState(),
+                                MobileCamp.DECK.get().defaultBlockState(),
                                 pose,
                                 buffers,
                                 light,

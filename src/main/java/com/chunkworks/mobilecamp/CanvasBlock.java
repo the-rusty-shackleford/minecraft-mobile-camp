@@ -46,6 +46,21 @@ public final class CanvasBlock extends HorizontalDirectionalBlock {
     }
 
     @Override
+    public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+        return defaultBlockState().setValue(FACING, context.getHorizontalDirection());
+    }
+
+    @Override
+    protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state,net.minecraft.world.level.Level level,
+            BlockPos pos,net.minecraft.world.entity.player.Player player,net.minecraft.world.phys.BlockHitResult hit) {
+        if(level instanceof net.minecraft.server.level.ServerLevel server) {
+            if(CampSites.get(server).owner(pos)!=null)return net.minecraft.world.InteractionResult.PASS;
+            level.setBlock(pos,player.isShiftKeyDown()?state.cycle(GABLE):state.cycle(RISE),3);
+        }
+        return net.minecraft.world.InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    @Override
     protected VoxelShape getShape(BlockState s, BlockGetter l, BlockPos p, CollisionContext c) {
         double base = s.getValue(RISE) * 6.6274;
         return Shapes.or(

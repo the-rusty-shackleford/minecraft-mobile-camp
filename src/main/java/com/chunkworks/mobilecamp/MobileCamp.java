@@ -42,13 +42,17 @@ public final class MobileCamp {
                                             .strength(2, 1200)
                                             .noOcclusion()
                                             .sound(SoundType.WOOD)));
+    public static final DeferredHolder<Block, CampControlBlock> CONTROL = BLOCKS.register("module_control",
+            () -> new CampControlBlock(BlockBehaviour.Properties.of().strength(2, 1200).noOcclusion().sound(SoundType.METAL)));
+    public static final DeferredHolder<Block, BedrollBlock> BEDROLL = BLOCKS.register("bedroll",
+            () -> new BedrollBlock(BlockBehaviour.Properties.of().strength(2, 1200).noOcclusion().sound(SoundType.WOOL)));
     public static final DeferredHolder<Block, CanvasBlock> CANVAS =
             BLOCKS.register(
                     "canvas",
                     () ->
                             new CanvasBlock(
                                     BlockBehaviour.Properties.of()
-                                            .strength(-1, 3600000)
+                                            .strength(2, 1200)
                                             .noOcclusion()
                                             .sound(SoundType.WOOL)));
     public static final DeferredHolder<Block, Block> FRAME =
@@ -57,7 +61,7 @@ public final class MobileCamp {
                     () ->
                             new Block(
                                     BlockBehaviour.Properties.of()
-                                            .strength(-1, 3600000)
+                                            .strength(2, 1200)
                                             .noOcclusion()
                                             .sound(SoundType.COPPER)) {
                                 @Override
@@ -75,7 +79,7 @@ public final class MobileCamp {
                     () ->
                             new Block(
                                     BlockBehaviour.Properties.of()
-                                            .strength(-1, 3600000)
+                                            .strength(2, 1200)
                                             .sound(SoundType.WOOD)));
     public static final DeferredHolder<Block, Block> DECK =
             BLOCKS.register(
@@ -83,7 +87,7 @@ public final class MobileCamp {
                     () ->
                             new Block(
                                     BlockBehaviour.Properties.of()
-                                            .strength(-1, 3600000)
+                                            .strength(2, 1200)
                                             .noOcclusion()
                                             .sound(SoundType.WOOD)) {
                                 @Override
@@ -92,9 +96,17 @@ public final class MobileCamp {
                                         net.minecraft.world.level.BlockGetter l,
                                         net.minecraft.core.BlockPos p,
                                         net.minecraft.world.phys.shapes.CollisionContext c) {
-                                    return Block.box(0, 8, 0, 16, 16, 16);
+                                    return Block.box(0, 0, 0, 16, 16, 16);
                                 }
                             });
+    public static final DeferredHolder<Block, Block> MOUNT = BLOCKS.register("module_mount",
+            () -> new Block(BlockBehaviour.Properties.of().strength(2,1200).sound(SoundType.METAL)));
+    public static final DeferredHolder<Item, BlockItem> DECK_ITEM = ITEMS.register("deck",()->new BlockItem(DECK.get(),new Item.Properties()));
+    public static final DeferredHolder<Item, BlockItem> FRAME_ITEM = ITEMS.register("frame",()->new BlockItem(FRAME.get(),new Item.Properties()));
+    public static final DeferredHolder<Item, BlockItem> PANEL_ITEM = ITEMS.register("panel",()->new BlockItem(PANEL.get(),new Item.Properties()));
+    public static final DeferredHolder<Item, BlockItem> CANVAS_ITEM = ITEMS.register("canvas",()->new BlockItem(CANVAS.get(),new Item.Properties()));
+    public static final DeferredHolder<Item, BlockItem> MOUNT_ITEM = ITEMS.register("module_mount",()->new BlockItem(MOUNT.get(),new Item.Properties()));
+    public static final DeferredHolder<Item, BedItem> BEDROLL_ITEM = ITEMS.register("bedroll",()->new BedItem(BEDROLL.get(),new Item.Properties().stacksTo(1)));
     public static final DeferredHolder<Item, CampItem> CAMP_ITEM =
             ITEMS.register("camp", () -> new CampItem(CAMP.get()));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CampBlockEntity>> CORE =
@@ -115,7 +127,7 @@ public final class MobileCamp {
                                                     0,
                                                     0,
                                                     0,
-                                                    Blocks.GREEN_BED
+                                                    BEDROLL.get()
                                                             .defaultBlockState()
                                                             .setValue(
                                                                     BedBlock.FACING,
@@ -125,7 +137,7 @@ public final class MobileCamp {
                                                     0,
                                                     0,
                                                     1,
-                                                    Blocks.GREEN_BED
+                                                    BEDROLL.get()
                                                             .defaultBlockState()
                                                             .setValue(
                                                                     BedBlock.FACING,
@@ -195,6 +207,9 @@ public final class MobileCamp {
                                                 out.accept(WORK.get());
                                                 out.accept(COOK.get());
                                                 out.accept(FIELD_KITCHEN.get());
+                                                out.accept(DECK_ITEM.get());out.accept(FRAME_ITEM.get());
+                                                out.accept(PANEL_ITEM.get());out.accept(CANVAS_ITEM.get());
+                                                out.accept(MOUNT_ITEM.get());out.accept(BEDROLL_ITEM.get());
                                             })
                                     .build());
 

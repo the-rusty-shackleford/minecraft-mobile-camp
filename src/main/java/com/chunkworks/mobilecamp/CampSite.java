@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerLevel;
 import java.util.*;
 
 /**
- * Placement result. AF: verified corner legs or localized failure. RI: immutable position list;
+ * Placement result. AF: verified foundation columns or localized failure. RI: immutable position list;
  * validity is momentary and must be checked at actual placement.
  */
 public record CampSite(List<BlockPos> supports, Component failure) {
@@ -19,7 +19,7 @@ public record CampSite(List<BlockPos> supports, Component failure) {
     }
 
     /**
-     * requires: server level; effects: checks loaded clear volume and stable corner footing,
+     * requires: server level; effects: checks loaded clear volume and stable footing across the footprint,
      * without modifying or loading terrain.
      */
     public static CampSite inspect(ServerLevel level, BlockPos core, int turns) {
@@ -28,7 +28,7 @@ public record CampSite(List<BlockPos> supports, Component failure) {
 
     static CampSite inspect(ServerLevel level, BlockPos core, int turns, boolean placed) {
         var supports = new ArrayList<BlockPos>();
-        for (var p : CampPlan.volume(core, turns)) {
+        for (var p : CampMechanism.volume(core, turns)) {
             if (placed && p.equals(core)) continue;
             if (!level.hasChunkAt(p)
                     || !level.getWorldBorder().isWithinBounds(p)
@@ -42,8 +42,8 @@ public record CampSite(List<BlockPos> supports, Component failure) {
                     || !state.getFluidState().isEmpty()
                     || level.getBlockEntity(p) != null) return fail("blocked", p);
         }
-        for (int x : new int[] {-3, 4})
-            for (int z : new int[] {0, 7}) {
+        for (int x = -3; x <= 4; x++)
+            for (int z = 0; z <= 7; z++) {
                 var foot =
                         core.offset(CampPlan.pos(new Shelter.Pos(x, 0, z).rotate(turns))).below();
                 int depth = 0;

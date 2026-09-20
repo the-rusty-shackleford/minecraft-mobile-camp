@@ -14,6 +14,7 @@ import java.util.stream.IntStream;
  */
 public final class CampMenu extends ChestMenu {
     private final ItemStack carrier;
+    private CampBlockEntity camp;
 
     public CampMenu(int id, Inventory inventory) {
         this(id, inventory, ItemStack.EMPTY);
@@ -23,9 +24,32 @@ public final class CampMenu extends ChestMenu {
         this(id, inventory, carrier, contents(inventory, carrier));
     }
 
+    public CampMenu(int id, Inventory inventory, CampBlockEntity camp) {
+        this(id, inventory, ItemStack.EMPTY, contents(inventory, ItemStack.EMPTY));
+        this.camp = camp;
+        refreshModules();
+    }
+
+    private void refreshModules() {
+        var modules = camp.editingModules();
+        for (int i=0; i<4; i++) getContainer().setItem(i, modules.get(i));
+    }
+
     private CampMenu(int id, Inventory inventory, ItemStack carrier, SimpleContainer container) {
         super(MobileCamp.MENU.get(), id, inventory, container, 1);
         this.carrier = carrier;
+        for (int i=0; i<9; i++) {
+            var old = slots.get(i);
+            final int bay = i;
+            var restricted = new Slot(container, i, old.x, old.y) {
+                @Override public boolean mayPlace(ItemStack stack) {
+                    return container.canPlaceItem(bay, stack);
+                }
+                @Override public boolean mayPickup(Player player) { return bay < 4; }
+            };
+            restricted.index = i;
+            slots.set(i, restricted);
+        }
         for (int i = 9; i < slots.size(); i++) {
             var old = slots.get(i);
             if (!carrier.isEmpty() && old.getItem() == carrier) {
@@ -73,17 +97,29 @@ public final class CampMenu extends ChestMenu {
 
     @Override
     public boolean stillValid(Player p) {
+        if (camp != null) return camp.canEditModules(p);
         return carrier.isEmpty() || p.getMainHandItem() == carrier || p.getOffhandItem() == carrier;
     }
 
     @Override
     public ItemStack quickMoveStack(Player p, int index) {
+        if (index < 0 || index >= slots.size()) return ItemStack.EMPTY;
         return slots.get(index).mayPickup(p) ? super.quickMoveStack(p, index) : ItemStack.EMPTY;
     }
 
     @Override
     public void clicked(int slot, int button, ClickType type, Player player) {
-        if (type == ClickType.SWAP && player.getInventory().getItem(button) == carrier) return;
+        if (!carrier.isEmpty() && type == ClickType.SWAP && player.getInventory().getItem(button) == carrier) return;
+        if (camp == null) { super.clicked(slot, button, type, player); return; }
+        if (!stillValid(player)) return;
+        refreshModules();
         super.clicked(slot, button, type, player);
+        camp.applyModules(IntStream.range(0,4).mapToObj(getContainer()::getItem).toList());
+    }
+
+    @Override
+    public void removed(Player player) {
+        super.removed(player);
+        if (camp != null) camp.closeModules(this);
     }
 }
