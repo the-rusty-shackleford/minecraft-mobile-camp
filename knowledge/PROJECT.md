@@ -5,12 +5,13 @@ Repository: minecraft-mobile-camp; mod id and artifact: mobilecamp.
 
 ## Current work
 
-Version 0.2.0 is implemented locally for the authorized combined release with
-Schnappviecher 0.1.1. Publication and deployment have not yet occurred.
-Rusty's latest restart instruction is a **120-second warning**, including
-disconnecting online players after that warning. This supersedes the earlier
-five-minute countdown and empty-server-only condition for this deployment.
-No countdown has been started. Unrelated held mod changes remain held.
+Version 0.2.0 was published and deployed with Schnappviecher 0.1.1 in pack
+1.52.0 on 2026-09-20. The authorized restart followed a 120-second warning and
+countdown reminders; startup completed at 21:32:01 UTC. Both installed artifact
+hashes match the releases, Mod Hub reports the server matches the published pack,
+and the server reported 20 TPS. Unrelated held mod changes remain held.
+Players should update their pack and pack/redeploy existing camps for the new layout.
+See [deployment evidence](../devtools/verification/0.2.0.md#live-deployment).
 
 [D-0001](decisions/D-0001.md) defines the designed expedition shelter and attached
 equipment. [D-0002](decisions/D-0002.md) sets the single deployed camp and collapse
