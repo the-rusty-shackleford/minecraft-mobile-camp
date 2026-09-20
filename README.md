@@ -7,8 +7,9 @@ and storage room, covered workshop and pitched canvas roof. The equipment is rea
 a bed, double chest, crafting table, furnace and campfire. Replace equipment through
 modules; the first field-kitchen upgrade adds a smoker.
 
-**Local prototype — not released or installed on the shared server.** Crafting costs
-and the visual design are still being discussed.
+**0.1.0 — first playable release.** Crafting costs and the visual design remain open
+to playtest feedback. Download the jar from [GitHub Releases](https://github.com/the-rusty-shackleford/minecraft-mobile-camp/releases/tag/v0.1.0)
+and install it on both the Minecraft client and server.
 
 ![C.A.M.P. in the real client](devtools/verification/camp-complete.png)
 

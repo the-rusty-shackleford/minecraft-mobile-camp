@@ -2,8 +2,12 @@
 
 Local first-playable implementation, Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21.
 Repository: `minecraft-mobile-camp`; mod id and artifact name: `mobilecamp`.
-Version 0.1.0 is a local candidate. No release, push, pack update or server restart
-has been authorized.
+Version 0.1.0 is the first playable release. On 2026-09-20 Rusty explicitly requested
+release, then directed a 120-second warning before disconnecting online players for
+the restart. This authorizes publication, the pack update and the warned restart,
+superseding the earlier release hold and empty-server-only restart condition for this
+deployment. The live pack was verified as 1.50.1; adding C.A.M.P. targets 1.51.0.
+Unrelated unreleased changes remain held.
 
 ## Product and decisions
 
