@@ -9,7 +9,8 @@ modules; the first field-kitchen upgrade adds a smoker.
 
 **0.1.0 — first playable release.** Crafting costs and the visual design remain open
 to playtest feedback. Download the jar from [GitHub Releases](https://github.com/the-rusty-shackleford/minecraft-mobile-camp/releases/tag/v0.1.0)
-and install it on both the Minecraft client and server.
+and install it on both the Minecraft client and server. The shared server includes
+it in **pack 1.51.0**; use **Update Pack** in Prism before joining.
 
 ![C.A.M.P. in the real client](devtools/verification/camp-complete.png)
 

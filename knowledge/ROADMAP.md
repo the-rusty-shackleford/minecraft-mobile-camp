@@ -23,7 +23,8 @@ under that delegation and remain subject to the playtest.
    inventories, interruptions and module exchange, then review the rendered transformation
    in the single permitted client with a muted booth.
 
-Rusty authorized release and the pack update on 2026-09-20, with a 120-second warning
-before restarting and disconnecting players. The bed uses normal position-based
+Rusty authorized release and the pack update on 2026-09-20, extending the restart
+warning from 120 seconds to five minutes before disconnecting players. After an
+inventory-recovery pause, a fresh five-minute warning was announced. The bed uses normal position-based
 respawn behavior: sleep after moving camp to set the new location. Inventory and cooking
 state are preserved in transit; cooking does not continue while packed.

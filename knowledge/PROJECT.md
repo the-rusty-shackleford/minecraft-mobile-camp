@@ -1,13 +1,19 @@
 # C.A.M.P.
 
-Local first-playable implementation, Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21.
+First playable release, Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21.
 Repository: `minecraft-mobile-camp`; mod id and artifact name: `mobilecamp`.
 Version 0.1.0 is the first playable release. On 2026-09-20 Rusty explicitly requested
-release, then directed a 120-second warning before disconnecting online players for
-the restart. This authorizes publication, the pack update and the warned restart,
-superseding the earlier release hold and empty-server-only restart condition for this
-deployment. The live pack was verified as 1.50.1; adding C.A.M.P. targets 1.51.0.
+release, then directed a warning before disconnecting online players for the restart.
+They extended the original 120-second countdown to five minutes. The countdown was
+subsequently paused for inventory recovery, then restarted with a fresh five-minute
+server announcement. This authorizes publication, the pack update and the warned
+restart, superseding the earlier release hold and empty-server-only restart condition
+for this deployment. The live pack was verified as 1.50.1; C.A.M.P. is published in 1.51.0.
 Unrelated unreleased changes remain held.
+
+Deployment completed on 2026-09-20 after the renewed five-minute warning. The server
+loaded C.A.M.P. 0.1.0, matched published pack 1.51.0, and reported 20 TPS with players
+reconnected. See [release verification](../devtools/verification/release-0.1.0.md).
 
 ## Product and decisions
 
