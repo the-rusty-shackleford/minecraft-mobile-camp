@@ -8,8 +8,8 @@ real piston wings and module mounts, full ground contact, corrected model geomet
 ordinary right-click deployed module access, spawn-preserving bedrolls and safe
 rejected placement. Verification and combined release are the current work.
 
-The local 0.3.0 Cartography Module is implemented and verified under D-0004;
-release awaits Rusty's instruction.
+The 0.3.0 Cartography Module is implemented and verified under D-0004;
+Rusty authorized its release with the two-minute server warning.
 
 Next: playtest the physical sequence and crafting balance, review further module additions,
 and exercise wider cross-mod and natural chunk-unload/restart scenarios.

@@ -7,14 +7,13 @@ enclosed sleeping and storage room, covered workshop and pitched canvas roof.
 Real redstone-powered pistons move the deck, wall and roof sections. The camp then
 attaches its bedroll, double chest, crafting table, furnace and campfire.
 
-**Version 0.2.0.** Download from [GitHub Releases](https://github.com/the-rusty-shackleford/minecraft-mobile-camp/releases/tag/v0.2.0).
+**Version 0.3.0.** Download from [GitHub Releases](https://github.com/the-rusty-shackleford/minecraft-mobile-camp/releases/tag/v0.3.0).
 Install matching versions on client and server. The shared-pack rollout is
 **1.52.0**; use **Update Pack** in Prism when the deployment is announced.
 
 ![C.A.M.P. in the real client](devtools/verification/0.2.0/camp-complete.png)
 
-The local **0.3.0** development update adds the Cartography Module; publication
-and deployment await release approval. Existing camps can install it through the
+**0.3.0** adds the Cartography Module. Existing camps can install it through the
 blue control without replacing the camp.
 
 ## Using your camp
@@ -137,3 +136,5 @@ non-overlapping parts inside a 2×2×3 volume. Keep coordinates stable across up
 cargo is keyed by them. This Java extension point is not a datapack module loader.
 
 Copyright Rusty Shackleford and nfx. AGPL-3.0-or-later.
+
+Clean release results: [version 0.3.0](devtools/verification/release-0.3.0.md).

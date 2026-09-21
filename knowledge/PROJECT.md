@@ -5,12 +5,12 @@ Repository: minecraft-mobile-camp; mod id and artifact: mobilecamp.
 
 ## Current work
 
-Local 0.3.0 adds the acknowledged [Cartography Module](decisions/D-0004.md).
+Version 0.3.0 adds the acknowledged [Cartography Module](decisions/D-0004.md).
 It installs through the existing third bay, retaining the crafting table and
 adding vanilla cartography. Four domain tests, eighteen real-server GameTests and
 the muted RTX 4070 shader booth passed, including actual Magical Map 0.1.0 menu
 operations. See [verification](../devtools/verification/cartography-module.md).
-Publication and deployment await Rusty's release instruction.
+Rusty authorized publication and deployment on September 20, 2026; see the release verification record.
 
 
 Version 0.2.0 was published and deployed with Schnappviecher 0.1.1 in pack
@@ -75,3 +75,11 @@ the isolated real-server regressions.
 0.1.0 was released and deployed on 2026-09-20 in pack 1.51.0 after the then-requested
 five-minute warning. The server loaded the matching artifact and reported 20 TPS.
 See [release verification](../devtools/verification/release-0.1.0.md).
+
+## Release authorization — September 20, 2026
+
+Rusty requested: "release it all, 2 minute server warning". Version 0.3.0 is
+authorized for public source/jar publication and pack 1.54.0 deployment. The clean
+build passed 4 JUnit tests, 18 real-server GameTests and the complete
+GPU shader booth. See [release verification](../devtools/verification/release-0.3.0.md).
+Earlier release holds are superseded for this version.
