@@ -13,6 +13,10 @@ Install matching versions on client and server. The shared-pack rollout is
 
 ![C.A.M.P. in the real client](devtools/verification/0.2.0/camp-complete.png)
 
+The local **0.3.0** development update adds the Cartography Module; publication
+and deployment await release approval. Existing camps can install it through the
+blue control without replacing the camp.
+
 ## Using your camp
 
 1. Find clear, loaded **10×8 space with six blocks of headroom**. The camp itself
@@ -32,7 +36,9 @@ Install matching versions on client and server. The shared-pack rollout is
 4. To change equipment, step outside and **right-click the blue module control**
    beside the core’s red switch. The first four slots are sleeping, storage,
    crafting and cooking. Take a module out to detach its equipment; insert a
-   compatible module to attach it. The field kitchen adds a smoker.
+   compatible module to attach it. The field kitchen adds a smoker. The
+   **Cartography Module** fits the third (crafting) slot and adds a cartography
+   table beside the crafting table, supporting vanilla maps and Magical Map atlases.
    Close the screen before packing. Only the owner or an operator may operate
    these controls; other players can use the stations.
 5. **Right-click the core’s red collapse switch** to fold the camp, then pick up
@@ -76,8 +82,9 @@ Chest            Green bed    Chest
 Crafting table   Furnace      Leather
 ~~~
 
-Individual modules use four iron ingots around their station, with leather below:
-green bed, chest, crafting table, furnace, or smoker respectively. The sleeping
+Individual modules use three iron ingots (above, left and right of the station),
+with leather below: green bed, chest, crafting table, furnace, smoker, or
+cartography table respectively. The sleeping
 module deploys a bedroll. These costs remain provisional.
 
 The new building pieces have separate recipes:
@@ -101,7 +108,7 @@ JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 ./gradlew test runGameTestServer ja
 uv run --no-project --python 3.14 python devtools/audit_models.py
 ~~~
 
-Four JDK-only domain tests cover layout rules. Sixteen real-server tests cover
+Four JDK-only domain tests cover layout rules. Eighteen real-server tests cover
 placement and inventory correction, module cargo and controls, sleep/respawn,
 ownership, terrain restoration, all piston strokes, cancellation, occupancy and
 core reload during motion. The model audit finds equally facing coplanar overlaps
@@ -112,6 +119,13 @@ both hands, cargo preservation, deployed module editing, packing and the packed
 module screen. It captures the structure and roof joints with the configured
 Iris/Sodium and Complementary shader setup. Check host processes before launch:
 this workspace permits only one rendering Minecraft client at a time.
+
+For optional atlas integration verification, put the released `magicalmap-0.1.0.jar`
+in the ignored `devtools/integration/` directory. The server and client gates then
+exercise actual atlas creation, binding and extraction on the deployed camp table.
+Without that jar they cover vanilla cartography and explicitly report the missing
+atlas integration gate. [Cartography verification](devtools/verification/cartography-module.md)
+records the run with the actual release.
 
 Verification code and external shader dependencies are excluded from the mod jar.
 The disposable server resets only this repository’s run/world fixture. The check

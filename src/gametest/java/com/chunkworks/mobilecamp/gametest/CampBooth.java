@@ -70,9 +70,11 @@ public final class CampBooth {
                                         }
                                     p.setGameMode(GameType.CREATIVE);
                                     p.getInventory().clearContent();
-                                    p.setItemInHand(
-                                            InteractionHand.MAIN_HAND,
-                                            PlacementGameTests.ladenCamp(l.registryAccess()));
+                                    var packed = PlacementGameTests.ladenCamp(l.registryAccess());
+                                    var modules = new java.util.ArrayList<>(CampCargo.read(packed, l.registryAccess()));
+                                    modules.set(2, new ItemStack(MobileCamp.CARTOGRAPHY.get()));
+                                    CampCargo.write(packed, modules, l.registryAccess());
+                                    p.setItemInHand(InteractionHand.MAIN_HAND, packed);
                                     view(p, .5, 100, -2.5, .5, 100, .5);
                                 });
                 case 70 -> {
@@ -109,33 +111,73 @@ public final class CampBooth {
                 case 345 -> photo(mc, "13-roof-eave-joint");
                 case 360 -> server(mc, p -> view(p, 2.5, 101, 11, .5, 102, 3));
                 case 400 -> photo(mc, "07-workshop-front");
-                case 420 -> server(mc, p -> view(p, .5, 101, 2.8, 2.8, 101.6, 1));
-                case 455 -> photo(mc, "08-bedroom-storage");
-                case 460 -> server(mc, p -> view(p, .5, 101, 2.8, -2, 101.4, 1.5));
-                case 495 -> photo(mc, "15-bedroll");
-                case 515 -> server(mc, p -> {
+                case 420 -> server(mc, p -> {
+                    view(p, -.5, 101, 7.5, -.5, 101.7, 5.5);
+                    p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                    p.getInventory().setItem(9, net.minecraft.world.item.MapItem.create(p.serverLevel(), 0, 0, (byte) 0, true, false));
+                    p.getInventory().setItem(10, new ItemStack(net.minecraft.world.item.Items.BOOK));
+                    p.inventoryMenu.sendAllDataToRemote();
+                });
+                case 435 -> mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND,
+                        new BlockHitResult(Vec3.atCenterOf(CORE.offset(-1,1,5)).add(0,.5,0),
+                                Direction.UP, CORE.offset(-1,1,5), false));
+                case 450 -> {
+                    verdict(mc.screen instanceof net.minecraft.client.gui.screens.inventory.CartographyTableScreen,
+                            "attached cartography table opens real client screen");
+                    mc.options.hideGui = false;
+                    photo(mc, "16-cartography-station");
+                }
+                case 455 -> mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,
+                        3, 0, net.minecraft.world.inventory.ClickType.QUICK_MOVE, mc.player);
+                case 465 -> {
+                    if (net.neoforged.fml.ModList.get().isLoaded("magicalmap"))
+                        mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,
+                                4, 0, net.minecraft.world.inventory.ClickType.QUICK_MOVE, mc.player);
+                }
+                case 475 -> {
+                    if (net.neoforged.fml.ModList.get().isLoaded("magicalmap")) {
+                        var atlas = net.minecraft.core.registries.BuiltInRegistries.ITEM.get(
+                                net.minecraft.resources.ResourceLocation.parse("magicalmap:atlas"));
+                        verdict(mc.player.containerMenu.getSlot(2).getItem().is(atlas), "camp table offers real atlas result");
+                        photo(mc, "17-camp-atlas-recipe");
+                        mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,
+                                2, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
+                    }
+                }
+                case 490 -> {
+                    if (net.neoforged.fml.ModList.get().isLoaded("magicalmap"))
+                        verdict(mc.player.containerMenu.getCarried().has(net.minecraft.core.component.DataComponents.CONTAINER),
+                                "actual client takes the atlas from camp cartography");
+                    mc.player.closeContainer();
+                    mc.options.hideGui = true;
+                }
+                case 520 -> server(mc, p -> view(p, .5, 101, 2.8, 2.8, 101.6, 1));
+                case 555 -> photo(mc, "08-bedroom-storage");
+                case 560 -> server(mc, p -> view(p, .5, 101, 2.8, -2, 101.4, 1.5));
+                case 595 -> photo(mc, "15-bedroll");
+                case 615 -> server(mc, p -> {
                     view(p, 1.5, 100, -2.5, 1.5, 100.5, .5);
                     p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                 });
-                case 530 -> mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND,
+                case 630 -> mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND,
                         new BlockHitResult(Vec3.atCenterOf(CORE.east()).add(0,0,-.5),
                                 Direction.NORTH, CORE.east(), false));
-                case 545 -> {
+                case 645 -> {
                     verdict(mc.player.containerMenu instanceof CampMenu, "ordinary deployed-control click opens modules");
                     mc.options.hideGui = false;
                     photo(mc, "14-deployed-module-control");
                 }
-                case 550 -> mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,
+                case 650 -> mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,
                         1, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
-                case 560 -> {
+                case 660 -> {
                     verdict(mc.player.containerMenu.getCarried().is(MobileCamp.STORAGE.get()),
                             "real menu click removes storage module");
                     server(mc, p -> verdict(p.serverLevel().getBlockEntity(CORE.offset(2,1,1)) == null,
                             "module removal detaches actual chest"));
                 }
-                case 570 -> mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,
+                case 670 -> mc.gameMode.handleInventoryMouseClick(mc.player.containerMenu.containerId,
                         1, 0, net.minecraft.world.inventory.ClickType.PICKUP, mc.player);
-                case 580 -> {
+                case 680 -> {
                     verdict(mc.player.containerMenu.getCarried().isEmpty(), "module reinserted through client packet");
                     server(mc, p -> {
                         var chest=(net.minecraft.world.level.block.entity.ChestBlockEntity)
@@ -146,15 +188,15 @@ public final class CampBooth {
                     mc.player.closeContainer();
                     mc.options.hideGui = true;
                 }
-                case 630 ->
+                case 730 ->
                         server(
                                 mc,
                                 p -> {
                                     view(p, .5, 100, -2.5, .5, 100.5, .5);
                                     p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                                 });
-                case 665 -> photo(mc, "09-collapse-button");
-                case 680 ->
+                case 765 -> photo(mc, "09-collapse-button");
+                case 780 ->
                         mc.gameMode.useItemOn(
                                 mc.player,
                                 InteractionHand.MAIN_HAND,
@@ -163,9 +205,9 @@ public final class CampBooth {
                                         Direction.NORTH,
                                         CORE,
                                         false));
-                case 695 -> server(mc, p -> view(p, 12, 106, 15, .5, 101.8, 3.5));
-                case 740 -> photo(mc, "10-collapsing");
-                case 880 -> {
+                case 795 -> server(mc, p -> view(p, 12, 106, 15, .5, 101.8, 3.5));
+                case 840 -> photo(mc, "10-collapsing");
+                case 980 -> {
                     photo(mc, "11-packed-pickup");
                     server(
                             mc,
@@ -190,19 +232,19 @@ public final class CampBooth {
                                 view(p, .5, 100, -2.5, .5, 100, .5);
                             });
                 }
-                case 910 -> {
+                case 1010 -> {
                     mc.options.hideGui = false;
                     mc.options.keyShift.setDown(true);
                 }
-                case 930 -> mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
-                case 960 -> {
+                case 1030 -> mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
+                case 1060 -> {
                     verdict(
                             mc.player.containerMenu instanceof CampMenu,
                             "sneak-use opens real synchronized module menu");
                     photo(mc, "12-module-bays");
                     mc.options.keyShift.setDown(false);
                 }
-                case 990 -> {
+                case 1090 -> {
                     mc.player.closeContainer();
                     LOG.info("camp booth: COMPLETE");
                     mc.stop();

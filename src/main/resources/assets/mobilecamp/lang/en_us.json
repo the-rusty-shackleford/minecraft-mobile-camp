@@ -14,7 +14,7 @@
   "camp.mobilecamp.bay_hint": "Swap modules",
   "camp.mobilecamp.bay.0": "Sleeping module",
   "camp.mobilecamp.bay.1": "Storage module",
-  "camp.mobilecamp.bay.2": "Crafting module",
+  "camp.mobilecamp.bay.2": "Crafting / cartography module",
   "camp.mobilecamp.bay.3": "Cooking module",
   "camp.mobilecamp.item_hint": "Place to unfold. Sneak-use in the air to change modules.",
   "camp.mobilecamp.already_deployed": "You already have a C.A.M.P. in %s at %s, %s, %s. Pack it first.",
@@ -31,5 +31,6 @@
   "block.mobilecamp.bedroll": "Expedition Bedroll",
   "camp.mobilecamp.editing": "Close the module screen before packing the camp.",
   "camp.mobilecamp.mechanism_blocked": "A piston could not complete its stroke. Your C.A.M.P. has packed itself back up.",
-  "block.mobilecamp.module_mount": "Expedition Module Mount"
+  "block.mobilecamp.module_mount": "Expedition Module Mount",
+  "item.mobilecamp.cartography_module": "Cartography Module"
 }

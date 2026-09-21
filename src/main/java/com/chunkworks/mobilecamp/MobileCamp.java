@@ -188,6 +188,12 @@ public final class MobileCamp {
                                                     0,
                                                     0,
                                                     Blocks.CRAFTING_TABLE.defaultBlockState()))));
+    public static final DeferredHolder<Item, ModuleItem> CARTOGRAPHY =
+            ITEMS.register(
+                    "cartography_module",
+                    () -> new ModuleItem(2, List.of(
+                            part(0, 0, 0, Blocks.CRAFTING_TABLE.defaultBlockState()),
+                            part(1, 0, 0, Blocks.CARTOGRAPHY_TABLE.defaultBlockState()))));
     public static final DeferredHolder<Item, ModuleItem> COOK =
             ITEMS.register("cooking_module", () -> new ModuleItem(3, cooking(false)));
     public static final DeferredHolder<Item, ModuleItem> FIELD_KITCHEN =
@@ -205,6 +211,7 @@ public final class MobileCamp {
                                                 out.accept(SLEEP.get());
                                                 out.accept(STORAGE.get());
                                                 out.accept(WORK.get());
+                                                out.accept(CARTOGRAPHY.get());
                                                 out.accept(COOK.get());
                                                 out.accept(FIELD_KITCHEN.get());
                                                 out.accept(DECK_ITEM.get());out.accept(FRAME_ITEM.get());

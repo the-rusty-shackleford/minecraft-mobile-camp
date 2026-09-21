@@ -73,6 +73,8 @@ dependencies {
     implementation sourceSets.domain.output
     gametestImplementation sourceSets.main.output
     gametestImplementation sourceSets.domain.output
+    // Actual optional atlas integration, kept out of the production artifact.
+    gametestRuntimeOnly fileTree('devtools/integration') { include 'magicalmap-*.jar' }
     testImplementation sourceSets.domain.output
     testImplementation 'org.junit.jupiter:junit-jupiter:5.9.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.2'
