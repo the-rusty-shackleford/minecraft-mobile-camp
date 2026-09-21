@@ -8,8 +8,8 @@ Real redstone-powered pistons move the deck, wall and roof sections. The camp th
 attaches its bedroll, double chest, crafting table, furnace and campfire.
 
 **Version 0.3.0.** Download from [GitHub Releases](https://github.com/the-rusty-shackleford/minecraft-mobile-camp/releases/tag/v0.3.0).
-Install matching versions on client and server. The shared-pack rollout is
-**1.52.0**; use **Update Pack** in Prism when the deployment is announced.
+Install matching versions on client and server. Deployed in shared pack
+**1.54.0**; use **Update Pack** in Prism to install the update.
 
 ![C.A.M.P. in the real client](devtools/verification/0.2.0/camp-complete.png)
 

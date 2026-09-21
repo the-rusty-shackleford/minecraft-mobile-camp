@@ -1,5 +1,8 @@
 # C.A.M.P.
 
+Version **0.3.0** is published and deployed in pack **1.54.0**.
+See [release and deployment verification](../devtools/verification/release-0.3.0.md).
+
 Minecraft 1.21.1 / NeoForge 21.1.248 / Java 21.
 Repository: minecraft-mobile-camp; mod id and artifact: mobilecamp.
 
